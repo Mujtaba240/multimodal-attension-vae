@@ -1,0 +1,45 @@
+# Data
+data/
+*.tar.gz
+*.zip
+
+# Model checkpoints
+results/checkpoints/
+*.pt
+*.pth
+*.ckpt
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Jupyter / Colab
+.ipynb_checkpoints/
+*.ipynb_metadata
+
+# LaTeX
+report/*.aux
+report/*.log
+report/*.out
+report/*.bbl
+report/*.blg
+report/*.fls
+report/*.fdb_latexmk
+report/*.synctex.gz
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Environment
+.env
+venv/

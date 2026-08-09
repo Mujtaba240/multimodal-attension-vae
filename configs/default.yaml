@@ -1,0 +1,43 @@
+data:
+  dataset: celeba
+  image_size: 64
+  crop_size: 148
+  num_workers: 2
+  pin_memory: true
+
+model:
+  name: mvae
+  latent_dim: 128
+  image_channels: 3
+  num_attributes: 40
+  encoder_hidden: [32, 64, 128, 256]
+  decoder_hidden: [256, 128, 64, 32]
+  attr_hidden: [128, 128]
+
+training:
+  batch_size: 128
+  epochs: 50
+  lr: 1.0e-3
+  weight_decay: 0.0
+  optimizer: adam
+  scheduler: cosine
+  grad_clip: 1.0
+
+loss:
+  beta: 1.0
+  beta_warmup_epochs: 10
+  recon_loss: mse
+  attr_loss: bce
+
+evaluation:
+  eval_every: 5
+  save_every: 10
+  num_samples: 64
+  fid_num_samples: 5000
+
+logging:
+  use_wandb: false
+  project_name: multimodal-vae
+  log_images_every: 5
+
+seed: 42
