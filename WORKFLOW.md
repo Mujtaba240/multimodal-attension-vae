@@ -27,12 +27,3 @@ DL&AI_Project/
 └── results/{figures,tables}/
 ```
 
-## Quick Commands
-
-```bash
-# Push code changes
-git add -A && git commit -m "msg" && git push
-
-# Pull latest in Colab (mid-session)
-!cd /content/repo && git pull origin main
-```
