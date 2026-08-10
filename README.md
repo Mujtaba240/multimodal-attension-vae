@@ -11,21 +11,19 @@ This project investigates how different multimodal fusion strategies affect the 
 
 ## Project Structure
 
-```
 ├── src/
-│   ├── models/          # VAE architectures
-│   ├── data/            # Dataset loading and preprocessing
-│   ├── utils/           # Training utilities, checkpointing, paths
-│   └── evaluation/      # Metrics and geometric analysis
-├── configs/             # Hyperparameter configs
-├── notebooks/           # Colab training notebooks
+│ ├── models/ # VAE architectures
+│ ├── data/ # Dataset loading and preprocessing
+│ ├── utils/ # Training utilities, checkpointing, paths
+│ └── evaluation/ # Metrics and geometric analysis
+├── configs/ # Hyperparameter configs
+├── notebooks/ # Colab training notebooks
 ├── results/
-│   ├── figures/
-│   ├── tables/
-│   └── checkpoints/
-├── report/              # LaTeX source for the course report
-└── scripts/             # Training entry points
-```
+│ ├── figures/
+│ ├── tables/
+│ └── checkpoints/
+├── report/ # LaTeX source for the course report
+└── scripts/ # Training entry points
 
 ## Methods
 
@@ -46,9 +44,11 @@ pip install -r requirements.txt
 
 - Kingma & Welling (2014). Auto-Encoding Variational Bayes.
 - Wu & Goodman (2018). Multimodal Generative Models for Scalable Weakly-Supervised Learning.
-- Shi et al. (2019). Variational Mixture-of-Experts Autoencoders.
+- Shi et al. (2019). Variational Mixture-of-Experts Autoencoders for Multi-Modal Deep Generative Models.
+- Shi et al. (2021). Relating by Contrasting: A Data-efficient Framework for Multimodal Generative Models.
 - Higgins et al. (2017). β-VAE: Learning Basic Visual Concepts with a Constrained Variational Framework.
-
-## License
-
-MIT
+- Vaswani et al. (2017). Attention Is All You Need.
+- Liu et al. (2015). Deep Learning Face Attributes in the Wild (CelebA).
+- Sutter et al. (2021). Generalized Multimodal ELBO.
+- Daunhawer et al. (2022). On the Limitations of Multimodal VAEs.
+- Heusel et al. (2017). GANs Trained by a Two Time-Scale Update Rule Converge to a Local Nash Equilibrium (FID).
