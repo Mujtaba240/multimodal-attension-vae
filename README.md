@@ -12,17 +12,29 @@ This project investigates how different multimodal fusion strategies affect the 
 ## Project Structure
 
 ├── src/
+
 │ ├── models/ # VAE architectures
+
 │ ├── data/ # Dataset loading and preprocessing
+
 │ ├── utils/ # Training utilities, checkpointing, paths
+
 │ └── evaluation/ # Metrics and geometric analysis
+
 ├── configs/ # Hyperparameter configs
+
 ├── notebooks/ # Colab training notebooks
+
 ├── results/
+
 │ ├── figures/
+
 │ ├── tables/
+
 │ └── checkpoints/
+
 ├── report/ # LaTeX source for the course report
+
 └── scripts/ # Training entry points
 
 ## Methods
