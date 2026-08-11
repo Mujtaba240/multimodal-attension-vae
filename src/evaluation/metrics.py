@@ -3,15 +3,49 @@
 import torch
 import torch.nn.functional as F
 import numpy as np
+from scipy import linalg
+from torchvision.models import inception_v3
 from torchmetrics.image import StructuralSimilarityIndexMeasure
-from torchmetrics.image.fid import FrechetInceptionDistance
+
+
+class InceptionFeatureExtractor:
+    def __init__(self, device):
+        self.model = inception_v3(pretrained=True, transform_input=False).to(device)
+        self.model.fc = torch.nn.Identity()
+        self.model.eval()
+        self.device = device
+
+    @torch.no_grad()
+    def extract(self, images):
+        # Resize to 299x299 for Inception
+        x = F.interpolate(images, size=(299, 299), mode="bilinear", align_corners=False)
+        if x.shape[1] == 1:
+            x = x.repeat(1, 3, 1, 1)
+        return self.model(x)
+
+
+def compute_fid(real_features, gen_features):
+    mu1, sigma1 = real_features.mean(0).cpu().numpy(), np.cov(real_features.cpu().numpy(), rowvar=False)
+    mu2, sigma2 = gen_features.mean(0).cpu().numpy(), np.cov(gen_features.cpu().numpy(), rowvar=False)
+
+    diff = mu1 - mu2
+    covmean, _ = linalg.sqrtm(sigma1 @ sigma2, disp=False)
+    if np.iscomplexobj(covmean):
+        covmean = covmean.real
+
+    return float(diff @ diff + np.trace(sigma1 + sigma2 - 2 * covmean))
 
 
 class VAEMetrics:
     def __init__(self, device="cuda"):
         self.device = device
         self.ssim = StructuralSimilarityIndexMeasure(data_range=1.0).to(device)
-        self.fid = FrechetInceptionDistance(feature=2048, normalize=True).to(device)
+        self.inception = None
+
+    def _get_inception(self):
+        if self.inception is None:
+            self.inception = InceptionFeatureExtractor(self.device)
+        return self.inception
 
     def reconstruction_mse(self, original, reconstructed):
         return F.mse_loss(reconstructed, original).item()
@@ -26,24 +60,16 @@ class VAEMetrics:
         per_attr_acc = (preds == true_attrs).float().mean(dim=0)
         return acc, per_attr_acc
 
-    def compute_fid(self, real_images, generated_images, batch_size=64):
-        self.fid.reset()
-        for i in range(0, len(real_images), batch_size):
-            batch_real = real_images[i:i+batch_size].to(self.device)
-            batch_gen = generated_images[i:i+batch_size].to(self.device)
-            self.fid.update(batch_real, real=True)
-            self.fid.update(batch_gen, real=False)
-        return self.fid.compute().item()
-
 
 @torch.no_grad()
 def evaluate_model(model, model_name, test_loader, device, num_fid_samples=5000):
     model.eval()
     metrics = VAEMetrics(device)
+    inception = metrics._get_inception()
 
     all_mse, all_ssim = [], []
     all_attr_acc = []
-    real_images, gen_images = [], []
+    real_features, gen_features = [], []
     count = 0
 
     for images, attrs in test_loader:
@@ -70,8 +96,8 @@ def evaluate_model(model, model_name, test_loader, device, num_fid_samples=5000)
             all_ssim.append(metrics.reconstruction_ssim(images, recon))
 
             if count < num_fid_samples:
-                real_images.append(images.cpu())
-                gen_images.append(recon.cpu())
+                real_features.append(inception.extract(images))
+                gen_features.append(inception.extract(recon))
                 count += images.size(0)
 
         if attr_recon is not None:
@@ -85,17 +111,16 @@ def evaluate_model(model, model_name, test_loader, device, num_fid_samples=5000)
     if all_attr_acc:
         results["attr_accuracy"] = np.mean(all_attr_acc)
 
-    if real_images and gen_images:
-        real_images = torch.cat(real_images)[:num_fid_samples]
-        gen_images = torch.cat(gen_images)[:num_fid_samples]
-        results["fid"] = metrics.compute_fid(real_images, gen_images)
+    if real_features and gen_features:
+        real_features = torch.cat(real_features)[:num_fid_samples]
+        gen_features = torch.cat(gen_features)[:num_fid_samples]
+        results["fid"] = compute_fid(real_features, gen_features)
 
     return results
 
 
 @torch.no_grad()
 def evaluate_cross_modal(model, model_name, test_loader, device):
-    """Generate images from attributes only, and attributes from images only."""
     model.eval()
     metrics = VAEMetrics(device)
 
@@ -105,11 +130,9 @@ def evaluate_cross_modal(model, model_name, test_loader, device):
         images, attrs = images.to(device), attrs.to(device)
 
         if model_name == "mvae":
-            # Image from attributes only
             img_recon, _, _, _ = model(image=None, attrs=attrs)
             img_from_attr_mse.append(F.mse_loss(img_recon, images).item())
 
-            # Attributes from image only
             _, attr_recon, _, _ = model(image=images, attrs=None)
             acc, _ = metrics.attribute_accuracy(attrs, attr_recon)
             attr_from_img_acc.append(acc)
