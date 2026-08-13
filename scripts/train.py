@@ -139,9 +139,13 @@ if __name__ == "__main__":
                         choices=["image_vae", "attr_vae", "mvae", "mmvae", "attn_fuse"])
     parser.add_argument("--data-dir", type=str, required=True)
     parser.add_argument("--ckpt-dir", type=str, required=True)
+    parser.add_argument("--beta", type=float, default=None)
     args = parser.parse_args()
 
     with open(args.config) as f:
         config = yaml.safe_load(f)
+
+    if args.beta is not None:
+        config["loss"]["beta"] = args.beta
 
     train(config, args.model, args.data_dir, args.ckpt_dir)
