@@ -9,13 +9,21 @@ This project investigates how different multimodal fusion strategies affect cros
 
 ## Project Structure
 ├── src/
+
 │ ├── models/ # ImageVAE, AttrVAE, MVAE, MMVAE, AttnFuse
+
 │ ├── data/ # CelebA dataloader
+
 │ ├── utils/ # Checkpointing, paths, reproducibility
+
 │ └── evaluation/ # Metrics, visualization, geometric analysis
+
 ├── configs/ # Training hyperparameters
+
 ├── scripts/ # Training and data download scripts
+
 ├── notebooks/ # Colab launcher
+
 └── report/ # LaTeX report source
 
 ## Methods
