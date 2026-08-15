@@ -35,11 +35,14 @@ This project investigates how different multimodal fusion strategies affect cros
 | MMVAE | Mixture of Experts |
 | **AttnFuse (ours)** | **Attention-based adaptive fusion** |
 
+
 ## Setup
 
 ```bash
 pip install -r requirements.txt
 ```
+
+Pretrained checkpoints are available upon request.
 
 ## References
 
